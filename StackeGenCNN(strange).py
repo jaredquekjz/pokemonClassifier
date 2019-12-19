@@ -146,7 +146,7 @@ def make_yolov3_model():
                                {'filter': 255, 'kernel': 1, 'stride': 1, 'bnorm': False, 'leaky': False, 'layer_idx': 105}], skip=False)
 
     model = Model(input_image, [yolo_82, yolo_94, yolo_106])
-    return model
+    return s
 
 
 def define_model1():
