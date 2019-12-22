@@ -26,9 +26,9 @@ datagen = ImageDataGenerator(rotation_range=40,
                              horizontal_flip=True, validation_split=0.2, rescale=1.0/255.0)
 
 train_data = datagen.flow_from_directory(
-    'pokemonData/train', batch_size=20, target_size=(128, 128), class_mode='categorical', subset='training')
+    'pokemonProject/train', batch_size=64, target_size=(128, 128), class_mode='categorical', subset='training')
 test_data = datagen.flow_from_directory(
-    'pokemonData/train', batch_size=20, target_size=(128, 128), class_mode='categorical', subset='validation')
+    'pokemonProject/train', batch_size=64, target_size=(128, 128), class_mode='categorical', subset='validation')
 
 trainX = train_data[0][0]
 trainY = train_data[0][1]
@@ -45,7 +45,7 @@ for i in range(len(test_data)-1):
 
 
 # Load models
-# Convolutional Neural Net(1-block VGG)
+# Chollet model
 
 def define_model1():
     model = Sequential()
@@ -69,6 +69,8 @@ def define_model1():
                   metrics=['accuracy'])
     return model
 
+# 1-block VGG model
+
 
 def define_model2():
     model = Sequential()
@@ -91,16 +93,12 @@ if path.exists('models') == 0:
     makedirs('models')
 n_members = 5
 
-# # simple early stopping
-# #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
 
 for i in range(n_members):
     model = define_model1()
     history = model.fit_generator(train_data,
-                                  steps_per_epoch=100,
                                   epochs=25,
-                                  validation_data=test_data,
-                                  validation_steps=50)
+                                  validation_data=test_data)
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
     loss = history.history['loss']
@@ -188,13 +186,9 @@ print()
 print('Stacked Test Accuracy: %.3f' % acc)
 
 
-testX = testX.reshape(
-    (testX.shape[0], testX.shape[1]*testX.shape[2]*testX.shape[3]))
-trainX = trainX.reshape(
-    (trainX.shape[0], trainX.shape[1]*trainX.shape[2]*trainX.shape[3]))
-
-kfold = KFold(n_splits=10, random_state=7)
-model = xgboost.XGBClassifier()
-scoring = 'accuracy'
-results = cross_val_score(model, trainX, trainY, cv=kfold, scoring=scoring)
-print("Accuracy: %.3f (%.3f)" % (results.mean(), results.std()))
+#
+# kfold = KFold(n_splits=10, random_state=7)
+# model = xgboost.XGBClassifier()
+# scoring = 'accuracy'
+# results = cross_val_score(model, trainX, trainY, cv=kfold, scoring=scoring)
+# print("Accuracy: %.3f (%.3f)" % (results.mean(), results.std()))
